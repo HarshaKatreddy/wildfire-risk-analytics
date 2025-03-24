@@ -1,0 +1,13 @@
+*.swp
+package-lock.json
+__pycache__
+.pytest_cache
+.venv
+*.egg-info
+data/fpa_fod.csv
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+# Ignore CDK output file
+cdk_outputs.json
