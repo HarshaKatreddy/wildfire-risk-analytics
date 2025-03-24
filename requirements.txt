@@ -17,3 +17,5 @@ constructs>=10.0.0
 rasterio
 beautifulsoup4
 requests
+geopandas
+shapely

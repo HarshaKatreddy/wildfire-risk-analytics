@@ -68,3 +68,8 @@ def get_table_names(database_name: str, prefix: str = "") -> list[str]:
     return tables
 
 NCLIMDIV_CRAWLER_NAME = cdk_outputs["NclimdivCrawlerName"]
+WRC_CRAWLER_NAME = cdk_outputs["WrcCrawlerName"]
+
+# WRC upload config
+WRC_LOCAL_PATH = str(Path("data/WRC_V2_County_Summary.csv"))
+WRC_S3_KEY = "wrc-v2/WRC_V2_County_Summary.csv"

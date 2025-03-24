@@ -174,6 +174,15 @@ class WildfireRiskAnalyticsStack(Stack):
             }
         )
 
+
+        # 🔹 Glue Database - Cleaned Data
+        self.clean_db_name = "wildfire_clean_db"
+        self.clean_db = glue.CfnDatabase(
+            self, "CleanedDB",
+            catalog_id=account,
+            database_input={"Name": self.clean_db_name}
+        )
+
         # 🔹 CDK Outputs
         CfnOutput(self, "RawBucketName", value=raw_bucket_name)
         CfnOutput(self, "ProcessedBucketName", value=processed_bucket_name)
