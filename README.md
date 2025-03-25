@@ -56,6 +56,12 @@ Provide:
 - Default region: `us-east-1`
 - Output format: `json`
 
+> 📦 Install CDK CLI (if first time):
+
+```bash
+npm install -g aws-cdk
+```
+
 ---
 
 ### 3. Download Fire Incident Data
@@ -78,10 +84,11 @@ cdk bootstrap
 ```
 
 This will:
+
 - Deploy AWS stack (S3, Lambda, Glue, IAM, EventBridge)
-- Upload data to S3 buckets
+- Upload datasets to raw S3 buckets
 - Run Glue Crawlers and create Athena tables
-- Prepare data for downstream analysis
+- Prepare data for downstream analysis and dashboarding
 
 ---
 
@@ -123,6 +130,23 @@ This will:
 
 ---
 
+## 📁 Project Structure
+
+```text
+infra/                     # CDK stack + Lambdas
+src/
+ ├── data/                 # Upload scripts
+ ├── orchestrator/        # Run crawlers
+ ├── config.py            # CDK + environment resolver
+scripts/
+ └── convert_nclimdiv_manually.py
+notebooks/
+ └── eda_athena.ipynb
+start_pipeline.sh         # Bootstrap everything
+```
+
+---
+
 ## 🧾 Key Use Cases for Insurers
 
 - Evaluate **wildfire exposure** at the county level
@@ -137,28 +161,5 @@ This will:
 - Auto-trigger QuickSight refresh
 - Add SageMaker predictive models
 - Stream real-time fire feeds (NASA FIRMS, GOES)
-
----
-
-## 📁 Project Structure
-
-```text
-infra/                     # CDK stack + Lambdas
-src/
- ├── data/                 # Upload scripts
- ├── orchestrator/        # Run crawlers
- ├── config.py            # CDK + env glue
-scripts/
- └── convert_nclimdiv_manually.py
-notebooks/
- └── eda_athena.ipynb
-start_pipeline.sh         # Bootstrap everything
-```
-
----
-
-## 📜 License
-
-MIT License
 
 ---
