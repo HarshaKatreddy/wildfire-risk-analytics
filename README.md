@@ -1,23 +1,24 @@
+---
 
 # 🔥 Wildfire Risk Analytics Platform (AWS Cloud-Native)
 
-A fully automated, scalable pipeline for wildfire risk intelligence, built on Amazon Web Services. This platform integrates climate, fire incident, and exposure datasets to deliver county-level wildfire risk metrics—tailored for insurance underwriting, portfolio rebalancing, and reinsurance analytics.
+A fully automated pipeline for wildfire risk intelligence, built on Amazon Web Services. This cloud-native system integrates climate, fire incident, and exposure datasets to deliver county-level wildfire risk metrics — tailored for insurance underwriting, reinsurance planning, and portfolio exposure monitoring.
 
 ---
 
 ## 📌 Project Highlights
 
-- 🧱 **Infrastructure-as-Code** with AWS CDK
-- 🛰️ **Open Datasets**: NOAA nClimDiv, FPA FOD, Wildfire Risk to Communities (WRC)
-- 🧪 **ETL** using AWS Glue, Athena, and Lambda
-- 📊 **Dashboard** via Amazon QuickSight
-- 🏢 **Insurance Focus**: Risk scores, housing exposure, and wildfire hazard normalized for underwriting decisions
+- 🧱 **Infrastructure-as-Code** via AWS CDK (Python)
+- 🛰️ **Public Datasets**: NOAA nClimDiv, FPA FOD, Wildfire Risk to Communities (WRC)
+- 🧪 **ETL Pipelines**: AWS Lambda, Glue Crawlers, Athena Queries
+- 📊 **Dashboard**: Live analytics with Amazon QuickSight
+- 🏢 **Insurance Use Case**: Risk normalization, WUI exposure, and hazard scores
 
 ---
 
-## 🛠️ Quick Setup Guide
+## 🛠️ Quick Setup
 
-### 1. Clone and Set Up the Environment
+### 1. Clone & Install Dependencies
 
 ```bash
 git clone https://github.com/HarshaKatreddy/wildfire-risk-analytics.git
@@ -26,11 +27,50 @@ python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-> ⚠️ Create a `.env` file based on `.env.template` and provide AWS credentials + paths.
+---
+
+### 2. Configure `.env` and AWS CLI
+
+#### ✅ Create `.env`
+
+In your project root, add the following:
+
+```bash
+PYTHONPATH=.
+AWS_DEFAULT_REGION=us-east-1
+```
+
+> No need to set bucket names or roles manually — they’re automatically pulled from `cdk_outputs.json`.
+
+#### 🔐 Set up AWS CLI
+
+Configure your credentials locally:
+
+```bash
+aws configure
+```
+
+Provide:
+- Access Key ID
+- Secret Access Key
+- Default region: `us-east-1`
+- Output format: `json`
 
 ---
 
-### 2. Deploy Full Infrastructure (via CDK + Shell Script)
+### 3. Download Fire Incident Data
+
+📥 [Download `fpa_fod.csv`](https://wildfire-raw-data-863518413936.s3.us-east-1.amazonaws.com/fpa-fod/fpa_fod.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA4SDNVKRYMO4755HI%2F20250325%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250325T173032Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=e80c863b755cd7bf726be12d9a2ae6bf9193b5bd782e362dcc5d8fddbb779dac)
+
+Save this file as:
+
+```bash
+data/fpa_fod.csv
+```
+
+---
+
+### 4. Deploy Infrastructure & Ingest Data
 
 ```bash
 cdk bootstrap
@@ -38,102 +78,87 @@ cdk bootstrap
 ```
 
 This will:
-- 🚀 Deploy AWS resources via CDK (S3, Lambda, Glue, IAM, EventBridge)
-- 📁 Upload raw datasets to S3
-- 🧹 Run Glue Crawlers
-- 🧮 Build Athena tables for downstream analytics
+- Deploy AWS stack (S3, Lambda, Glue, IAM, EventBridge)
+- Upload data to S3 buckets
+- Run Glue Crawlers and create Athena tables
+- Prepare data for downstream analysis
 
 ---
 
-## 🧠 Project Architecture
+## 📊 Analysis & Visualization
+
+- 🔍 **Exploratory Analysis**: [`notebooks/eda_athena.ipynb`](notebooks/eda_athena.ipynb)
+- ⚙️ **Athena Transformations**: Normalization, joining on GEOID, imputation
+- 📈 **Dashboard (QuickSight)**:  
+  - Wildfire hazard maps  
+  - Housing exposure & WUI impact  
+  - PDSI, precipitation, temperature trends  
+  - KPI cards for insurers
+
+---
+
+## 🧱 Architecture
 
 ```text
 📁 raw S3
-  └── fpa-fod/
-  └── wrc-v2/
-  └── nclimdiv-county/
-       └── climdiv-pcpncy/
-       └── climdiv-tmaxcy/
-       ...
+ ├── fpa-fod/
+ ├── wrc-v2/
+ └── nclimdiv-county/
 
 📁 processed S3
-  └── nclimdiv/ (converted to long-format CSV)
+ └── nclimdiv/
 
 🧠 Glue Databases
-  └── wildfire_fpa_fod_db
-  └── wildfire_wrc_db
-  └── wildfire_nclimdiv_db
-  └── wildfire_clean_db (transformed tables)
+ ├── wildfire_fpa_fod_db
+ ├── wildfire_wrc_db
+ ├── wildfire_nclimdiv_db
+ └── wildfire_clean_db
 
-🧮 Athena ETL
-  └── Joins all datasets on `geoid`
-  └── Normalizes & imputes risk metrics
+🧮 Athena
+ └── SQL ETL via config.py + notebooks
 
 📊 QuickSight
-  └── Live connection to Athena
-  └── Visual dashboards for insurers
+ └── Live visuals for insurance risk
 ```
 
 ---
 
-## 📊 Analysis & Dashboard
+## 🧾 Key Use Cases for Insurers
 
-- **Notebook-based EDA**: See [`notebooks/eda_athena.ipynb`](notebooks/eda_athena.ipynb) for analysis, sanity checks, and feature generation using Athena queries.
-- **Final Dashboard**: Built on Athena outputs. Features:
-  - Choropleth risk maps by county
-  - Climate trends (precipitation, PDSI, temperature)
-  - Burn probability & housing exposure metrics
-  - KPI cards for hazard potential, normalized risks
+- Evaluate **wildfire exposure** at the county level
+- Quantify **housing unit risk** across fire-prone zones
+- Normalize scores to support **premium setting**
+- Inform **reinsurance strategy** based on real-world indicators
 
 ---
 
-## 📁 Key Files
+## 🚀 What’s Next
+
+- Auto-trigger QuickSight refresh
+- Add SageMaker predictive models
+- Stream real-time fire feeds (NASA FIRMS, GOES)
+
+---
+
+## 📁 Project Structure
 
 ```text
-📦 src/
- ├── data/                   # Upload scripts for WRC, FPA, NOAA
- ├── orchestrator/           # Trigger Glue crawlers
- ├── config.py               # Centralized environment config
-📦 infra/
- ├── lambdas/                # Two Lambda functions (download NOAA, convert to CSV)
- ├── wildfire_risk_stack.py  # CDK Stack definition
-📦 scripts/
+infra/                     # CDK stack + Lambdas
+src/
+ ├── data/                 # Upload scripts
+ ├── orchestrator/        # Run crawlers
+ ├── config.py            # CDK + env glue
+scripts/
  └── convert_nclimdiv_manually.py
-📦 notebooks/
- └── eda_athena.ipynb        # Interactive exploration
-start_pipeline.sh            # Runs full ingestion and crawler pipeline
-requirements.txt
+notebooks/
+ └── eda_athena.ipynb
+start_pipeline.sh         # Bootstrap everything
 ```
-
----
-
-## 🧾 Use Cases for Insurers
-
-- 🔍 Evaluate wildfire exposure at the **county level**
-- ✍️ Price premiums by combining burn probability and housing risk
-- 🧮 Identify underweight/overweight portfolios in **WUI regions**
-- ♻️ Support **reinsurance negotiations** with empirical risk signals
-
----
-
-## 📌 Future Enhancements
-
-- 🔄 Auto-trigger crawlers and QuickSight refresh on new data arrival
-- 🤖 Integrate predictive modeling using SageMaker
-- 🧬 Incorporate real-time fire feeds (e.g., NASA FIRMS)
 
 ---
 
 ## 📜 License
 
-This project is open-source under the MIT License.
+MIT License
 
 ---
-
-Let me know if you want me to add:
-
-- A QuickSight dashboard preview image
-- Architecture diagram in Mermaid or PNG
-- GitHub Actions CI/CD instructions
-
-Would you like this version pushed directly to your repo as a `README.md`?
