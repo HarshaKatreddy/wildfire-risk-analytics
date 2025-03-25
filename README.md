@@ -163,3 +163,17 @@ start_pipeline.sh         # Bootstrap everything
 - Stream real-time fire feeds (NASA FIRMS, GOES)
 
 ---
+
+## 📜 License
+
+This project is open-source under the MIT License.
+
+---
+
+## 📚 References
+
+- Short, K. C. (2022). *Spatial wildfire occurrence data for the United States, 1992–2020 [FPA_FOD_20221014]* (6th Edition). Fort Collins, CO: Forest Service Research Data Archive. https://doi.org/10.2737/RDS-2013-0009.6
+
+- Vose, R. S., Applequist, S., Squires, M., Durre, I., Menne, M. J., Williams, C. N., Fenimore, C., Gleason, K., & Arndt, D. (2014). *NOAA Monthly U.S. Climate Divisional Database (NClimDiv)*. NOAA National Climatic Data Center. https://doi.org/10.7289/V5M32STR
+
+- Scott, J. H., Dillon, G. K., Jaffe, M. R., Vogler, K. C., Olszewski, J. H., Callahan, M. N., Karau, E. C., Lazarr, M. T., Short, K. C., Riley, K. L., Finney, M. A., & Grenfell, I. C. (2024). *Wildfire Risk to Communities: Spatial datasets of landscape-wide wildfire risk components for the United States* (2nd Edition). Fort Collins, CO: Forest Service Research Data Archive. https://doi.org/10.2737/RDS-2020-0016-2
