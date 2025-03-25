@@ -1,68 +1,139 @@
-# Wildfire Risk Analytics (AWS Cloud-Native, CDK + Boto3-Driven)
 
-## 📁 Folder Structure
+# 🔥 Wildfire Risk Analytics Platform (AWS Cloud-Native)
 
-- `wildfire_risk_analytics/`: CDK stack definition (infrastructure-as-code)
-- `src/`: Python modules for data ingestion, config, orchestrator
-- `.env`: AWS credentials (excluded from Git)
-- `requirements.txt`: Python package dependencies
-- `README.md`: Project setup and instructions
+A fully automated, scalable pipeline for wildfire risk intelligence, built on Amazon Web Services. This platform integrates climate, fire incident, and exposure datasets to deliver county-level wildfire risk metrics—tailored for insurance underwriting, portfolio rebalancing, and reinsurance analytics.
 
 ---
 
-## 🛠️ Setup Instructions
+## 📌 Project Highlights
+
+- 🧱 **Infrastructure-as-Code** with AWS CDK
+- 🛰️ **Open Datasets**: NOAA nClimDiv, FPA FOD, Wildfire Risk to Communities (WRC)
+- 🧪 **ETL** using AWS Glue, Athena, and Lambda
+- 📊 **Dashboard** via Amazon QuickSight
+- 🏢 **Insurance Focus**: Risk scores, housing exposure, and wildfire hazard normalized for underwriting decisions
+
+---
+
+## 🛠️ Quick Setup Guide
+
+### 1. Clone and Set Up the Environment
 
 ```bash
-# 1. Clone the repo and enter the project
-git clone https://github.com/yourusername/wildfire-risk-analytics.git
+git clone https://github.com/HarshaKatreddy/wildfire-risk-analytics.git
 cd wildfire-risk-analytics
-
-# 2. Create and activate a virtual environment
-python3 -m venv .venv
-source .venv/bin/activate  # For Windows: .venv\Scripts\activate
-
-# 3. Install Python dependencies
+python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
+```
 
-# 4. Install AWS CDK globally
-npm install -g aws-cdk
-cdk --version
+> ⚠️ Create a `.env` file based on `.env.template` and provide AWS credentials + paths.
 
-# 5. Initialize CDK Project (already done in this repo)
-# Skip this if CDK files are present. If starting fresh:
-cdk init app --language python
+---
 
-# 6. Bootstrap the environment (only once per account/region)
-cdk bootstrap
-
-# 7. Deploy infrastructure using CDK
-cdk deploy
-
-# ✅ Post-CDK Setup
-
-Once CDK deployment completes successfully, a file named `cdk_outputs.json` will be generated.
-
-Make sure it's present in the **root directory** as it contains the dynamically generated:
-
-- Raw S3 bucket name
-- Processed S3 bucket name
-- Glue IAM role ARN
-
-We use this file in our config to avoid hardcoding any AWS resource names.
-
-> ⚠️ Important: Do not check this file into Git. It is auto-generated and account-specific.
+### 2. Deploy Full Infrastructure (via CDK + Shell Script)
 
 ```bash
-# .gitignore
-cdk_outputs.json
+cdk bootstrap
+./start_pipeline.sh
+```
 
-🔐 Environment Variables
-Create a .env file in the project root with the following:
+This will:
+- 🚀 Deploy AWS resources via CDK (S3, Lambda, Glue, IAM, EventBridge)
+- 📁 Upload raw datasets to S3
+- 🧹 Run Glue Crawlers
+- 🧮 Build Athena tables for downstream analytics
 
-AWS_ACCESS_KEY_ID=your_aws_access_key
-AWS_SECRET_ACCESS_KEY=your_aws_secret_key
-AWS_DEFAULT_REGION=us-east-1
+---
 
-⚙️ Configuration
-All environment-aware and AWS-aware settings are centralized in:
-src/config.py
+## 🧠 Project Architecture
+
+```text
+📁 raw S3
+  └── fpa-fod/
+  └── wrc-v2/
+  └── nclimdiv-county/
+       └── climdiv-pcpncy/
+       └── climdiv-tmaxcy/
+       ...
+
+📁 processed S3
+  └── nclimdiv/ (converted to long-format CSV)
+
+🧠 Glue Databases
+  └── wildfire_fpa_fod_db
+  └── wildfire_wrc_db
+  └── wildfire_nclimdiv_db
+  └── wildfire_clean_db (transformed tables)
+
+🧮 Athena ETL
+  └── Joins all datasets on `geoid`
+  └── Normalizes & imputes risk metrics
+
+📊 QuickSight
+  └── Live connection to Athena
+  └── Visual dashboards for insurers
+```
+
+---
+
+## 📊 Analysis & Dashboard
+
+- **Notebook-based EDA**: See [`notebooks/eda_athena.ipynb`](notebooks/eda_athena.ipynb) for analysis, sanity checks, and feature generation using Athena queries.
+- **Final Dashboard**: Built on Athena outputs. Features:
+  - Choropleth risk maps by county
+  - Climate trends (precipitation, PDSI, temperature)
+  - Burn probability & housing exposure metrics
+  - KPI cards for hazard potential, normalized risks
+
+---
+
+## 📁 Key Files
+
+```text
+📦 src/
+ ├── data/                   # Upload scripts for WRC, FPA, NOAA
+ ├── orchestrator/           # Trigger Glue crawlers
+ ├── config.py               # Centralized environment config
+📦 infra/
+ ├── lambdas/                # Two Lambda functions (download NOAA, convert to CSV)
+ ├── wildfire_risk_stack.py  # CDK Stack definition
+📦 scripts/
+ └── convert_nclimdiv_manually.py
+📦 notebooks/
+ └── eda_athena.ipynb        # Interactive exploration
+start_pipeline.sh            # Runs full ingestion and crawler pipeline
+requirements.txt
+```
+
+---
+
+## 🧾 Use Cases for Insurers
+
+- 🔍 Evaluate wildfire exposure at the **county level**
+- ✍️ Price premiums by combining burn probability and housing risk
+- 🧮 Identify underweight/overweight portfolios in **WUI regions**
+- ♻️ Support **reinsurance negotiations** with empirical risk signals
+
+---
+
+## 📌 Future Enhancements
+
+- 🔄 Auto-trigger crawlers and QuickSight refresh on new data arrival
+- 🤖 Integrate predictive modeling using SageMaker
+- 🧬 Incorporate real-time fire feeds (e.g., NASA FIRMS)
+
+---
+
+## 📜 License
+
+This project is open-source under the MIT License.
+
+---
+
+Let me know if you want me to add:
+
+- A QuickSight dashboard preview image
+- Architecture diagram in Mermaid or PNG
+- GitHub Actions CI/CD instructions
+
+Would you like this version pushed directly to your repo as a `README.md`?
